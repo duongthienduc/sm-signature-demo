@@ -1,7 +1,9 @@
-import {ethers, utils} from 'ethers';
+import Web3 from 'web3';
 
+import config from '../../src/config';
 import createSignature from '../../src/sm/createSignature';
-import {connectSigner, smProvider} from '../../src/utils/connectSm';
+
+const {signSecret} = config;
 
 describe('BSC Bridge Contract', () => {
   it('get signed message', async () => {
@@ -13,20 +15,34 @@ describe('BSC Bridge Contract', () => {
       'name',
     );
 
-    expect(signature).toBe('0x9ea836aa7818630c3c1c43fad280a43e9c85e1750220d6b05c2b7c3eca23a95c');
+    expect(signature).toBe('0xc4ddd5beb09ed090b718ddb91ba8bbd749ddad5f90cf26bc48a1faa611f7ad1e');
+    var web3 = new Web3();
+    const message = web3.utils.soliditySha3(
+      97,
+      '0x4aeADe5169473615f6f87cD5F9cd6d38CD8e4602',
+      '0xEe33A178F09C5326141313f9bB7b275298A03705',
+      amount,
+      '0x23719809662f2879c685a4b3654a94a1ae2906bf',
+      'name',
+      signSecret,
+    );
 
-    let walletPath = {
-      standard: "m/44'/60'/0'/0/0",
-    };
+    // NOTE: for SM in Kingdom Raid please use web3.eth.abi.encodeParameters method instead
+    // const message = web3.utils.keccak256(
+    //   web3.eth.abi.encodeParameters(
+    //     ['uint', 'address', 'address', 'uint256', 'address', 'string', 'string'],
+    //     [
+    //       97,
+    //       '0x4aeADe5169473615f6f87cD5F9cd6d38CD8e4602',
+    //       '0xEe33A178F09C5326141313f9bB7b275298A03705',
+    //       BigNumber.from(amount),
+    //       '0x23719809662f2879c685a4b3654a94a1ae2906bf',
+    //       'name',
+    //       signSecret,
+    //     ],
+    //   ),
+    // );
 
-    let mnemonic = 'radar blur cabbage chef fix engine embark joy scheme fiction master release';
-    let hdnode = utils.HDNode.fromMnemonic(mnemonic);
-    let node = hdnode.derivePath(walletPath.standard);
-
-    let wallet = new ethers.Wallet(node.privateKey, smProvider);
-
-    const smContract = connectSigner(wallet);
-    // Need a wallet with sufficient amount of gas to run
-    // const res = await smContract.transit('0xEe33A178F09C5326141313f9bB7b275298A03705', amount, 'name', signature);
+    expect(message).toBe('0xc4ddd5beb09ed090b718ddb91ba8bbd749ddad5f90cf26bc48a1faa611f7ad1e');
   });
 });

@@ -3,4 +3,4 @@ const path = require('path');
 
 dotenv.config({ path: path.resolve('./.env.test') });
 
-jest.setTimeout(15000);
+jest.setTimeout(30000);
